@@ -1,7 +1,3 @@
-Here’s a `README.md` file you can use for your GitHub repository. It provides clear instructions on how to set up and run the voter registration automation script.
-
----
-
 # Voter Registration Automation Script
 
 This Python script automates the process of checking voter registration status on the [Pennsylvania Voter Services](https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx) website. It uses Selenium to interact with the web page, fill out the form, and retrieve the results.
