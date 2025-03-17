@@ -140,7 +140,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - [Selenium](https://www.selenium.dev/) for browser automation.
 - [ChromeDriver](https://sites.google.com/chromium.org/driver/) for enabling Chrome automation.
-
----
-
-Let me know if you need further assistance!
