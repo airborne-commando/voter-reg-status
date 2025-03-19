@@ -132,7 +132,7 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the The Unlicense. See the [LICENSE](LICENSE) file for details.
 
 ---
 
