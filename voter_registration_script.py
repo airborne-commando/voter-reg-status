@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
+import sys  # Import the sys module for exiting the program
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
@@ -152,6 +153,8 @@ def main():
                 with open(f"results_{input_data['first_name']}_{input_data['last_name']}.txt", 'w', encoding='utf-8') as f:
                     f.write(results)
                 print(f"Results saved to 'results_{input_data['first_name']}_{input_data['last_name']}.txt'.")
+                # Exit the program after finding results
+                sys.exit(0)
 
             # Refresh the page for the next inquiry
             driver.refresh()
