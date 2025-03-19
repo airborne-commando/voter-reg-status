@@ -135,16 +135,3 @@ This project is licensed under The Unlicense. See the [LICENSE](LICENSE) file fo
 
 - [Selenium](https://www.selenium.dev/) for browser automation.
 - [ChromeDriver](https://sites.google.com/chromium.org/driver/) for enabling Chrome automation.
-
-### Key Changes:
-1. **Session Limit**:
-   - Updated the session limit from 16 to 15 searches to reflect the script's behavior.
-
-2. **Browser Window**:
-   - Clarified that the browser window is minimized by default, as per the script's configuration.
-
-3. **CAPTCHA Handling**:
-   - Updated the CAPTCHA section to reflect the script's behavior of restarting the browser after 15 searches.
-
-4. **General Cleanup**:
-   - Improved formatting and consistency throughout the document.
