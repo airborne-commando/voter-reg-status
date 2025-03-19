@@ -130,6 +130,14 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 Edit the city_temp.csv values with libre office and save the file as a .csv
 
+Here's How I did this
+
+A2 will copy =A1
+B2 Will copy =B1
+and so forth.
+
+
+
 ---
 
 ## License
