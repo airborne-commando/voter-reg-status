@@ -98,10 +98,10 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 ## Limitations
 
 1. **CAPTCHA**:
-   - The script is designed to avoid triggering CAPTCHA by introducing random delays and limiting the number of searches per session (15 searches), will take time to start back up.
+   - The script is designed to avoid triggering CAPTCHA by limiting the number of searches to 15 per session.
 
 2. **Session Limit**:
-   - After 15 searches, the script will restart the browser to avoid being flagged as a bot.
+   - After 15 searches, the script will restart the browser to avoid being flagged as a bot, will take time to start back up.
 
 3. **Browser Compatibility**:
    - The script is tested with Google Chrome and ChromeDriver. Other browsers are not supported.
