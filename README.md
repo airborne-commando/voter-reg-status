@@ -136,7 +136,7 @@ A2 will copy =A1
 B2 Will copy =B1
 and so forth.
 
-=DATE(1988,3,1) for the date as an example (e1)
+=DATE(1970,12,1) for the date as an example (e1)
 
 E2 will add E1
 
