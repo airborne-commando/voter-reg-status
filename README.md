@@ -98,11 +98,10 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 ## Limitations
 
 1. **CAPTCHA**:
-   - The script is designed to avoid triggering CAPTCHA by introducing random delays and limiting the number of searches per session (16 searches).
-   - If CAPTCHA appears, you will need to solve it manually.
+   - The script is designed to avoid triggering CAPTCHA by introducing random delays and limiting the number of searches per session (15 searches), will take time to start back up.
 
 2. **Session Limit**:
-   - After 16 searches, the script will stop and prompt you to restart it to avoid being flagged as a bot.
+   - After 15 searches, the script will restart the browser to avoid being flagged as a bot.
 
 3. **Browser Compatibility**:
    - The script is tested with Google Chrome and ChromeDriver. Other browsers are not supported.
@@ -117,22 +116,18 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
    - Ensure the version of ChromeDriver matches your Chrome browser version.
    - Download the correct version from [here](https://sites.google.com/chromium.org/driver/).
 
-2. **CAPTCHA Appears**:
-   - If CAPTCHA appears, pause the script and solve it manually in the browser.
-   - Reduce the number of searches per session or increase delays between actions.
-
-3. **Element Not Found**:
-   - Ensure the browser window is maximized.
+2. **Element Not Found**:
+   - Ensure the browser window is minimized (as per the script's configuration).
    - Check the page source (`page_source.txt`) and screenshot (`error_screenshot.png`) for debugging.
 
-4. **File Not Found**:
+3. **File Not Found**:
    - Ensure the input file path is correct and the file is formatted properly.
 
 ---
 
 ## License
 
-This project is licensed under the The Unlicense. See the [LICENSE](LICENSE) file for details.
+This project is licensed under The Unlicense. See the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -140,3 +135,16 @@ This project is licensed under the The Unlicense. See the [LICENSE](LICENSE) fil
 
 - [Selenium](https://www.selenium.dev/) for browser automation.
 - [ChromeDriver](https://sites.google.com/chromium.org/driver/) for enabling Chrome automation.
+
+### Key Changes:
+1. **Session Limit**:
+   - Updated the session limit from 16 to 15 searches to reflect the script's behavior.
+
+2. **Browser Window**:
+   - Clarified that the browser window is minimized by default, as per the script's configuration.
+
+3. **CAPTCHA Handling**:
+   - Updated the CAPTCHA section to reflect the script's behavior of restarting the browser after 15 searches.
+
+4. **General Cleanup**:
+   - Improved formatting and consistency throughout the document.
