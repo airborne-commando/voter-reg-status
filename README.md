@@ -128,7 +128,7 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 ## Quick Tips on CSV
 
-Edit the city_temp.csv values with libre office and save the file as a .csv
+Edit the city_temp.ODS values with libre office and save the file as a .csv
 
 Here's How I did this
 
@@ -146,7 +146,7 @@ and Will add in a sum
 
 =SUM(E2)+1
 
-I encourge you to take a look at the .CSV file.
+I encourge you to take a look at the .ODS file.
 
 ---
 
