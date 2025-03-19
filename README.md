@@ -128,14 +128,7 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 ## Quick Tips on CSV
 
-For data entry on a date of birth enter something like this for example:
-
-      =DATE(1981,5,1)
-
-
-and to add the day(s) AKA guess:
-
-      =E1+1
+Edit the city_temp.csv values with libre office and save the file as a .csv
 
 ---
 
