@@ -134,3 +134,15 @@ This project is licensed under The Unlicense. See the [LICENSE](LICENSE) file fo
 
 - [Selenium](https://www.selenium.dev/) for browser automation.
 - [ChromeDriver](https://sites.google.com/chromium.org/driver/) for enabling Chrome automation.
+
+
+## Quick Tips on CSV
+
+For data entry on a date of birth enter something like this for example:
+
+      =DATE(1981,5,1)
+
+
+and to add the day(s) AKA guess:
+
+      =E1+1
