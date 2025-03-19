@@ -136,7 +136,15 @@ A2 will copy =A1
 B2 Will copy =B1
 and so forth.
 
+E2 will add E1
 
+=E1+1
+
+and Will add in a sum
+
+=SUM(E2)+1
+
+I encourge you to take a look at the .CSV file.
 
 ---
 
