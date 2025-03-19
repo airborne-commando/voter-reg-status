@@ -11,7 +11,8 @@ This Python script automates the process of checking voter registration status o
 4. [Input File Format](#input-file-format)
 5. [Limitations](#limitations)
 6. [Troubleshooting](#troubleshooting)
-7. [License](#license)
+7. [quick tips on CSV](#QuickTipsonCSV)
+8. [License](#license)
 
 ---
 
@@ -121,6 +122,20 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 3. **File Not Found**:
    - Ensure the input file path is correct and the file is formatted properly.
+  
+---
+
+
+## Quick Tips on CSV
+
+For data entry on a date of birth enter something like this for example:
+
+      =DATE(1981,5,1)
+
+
+and to add the day(s) AKA guess:
+
+      =E1+1
 
 ---
 
@@ -134,15 +149,3 @@ This project is licensed under The Unlicense. See the [LICENSE](LICENSE) file fo
 
 - [Selenium](https://www.selenium.dev/) for browser automation.
 - [ChromeDriver](https://sites.google.com/chromium.org/driver/) for enabling Chrome automation.
-
-
-## Quick Tips on CSV
-
-For data entry on a date of birth enter something like this for example:
-
-      =DATE(1981,5,1)
-
-
-and to add the day(s) AKA guess:
-
-      =E1+1
