@@ -9,9 +9,9 @@ import random
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
 
-# Function to simulate human-like delays
-def human_delay(min_seconds=1, max_seconds=3):
-    time.sleep(random.uniform(min_seconds, max_seconds))
+# Function to simulate minimal delays (optional)
+def minimal_delay():
+    time.sleep(0.01)  # Very small delay to avoid overwhelming the system
 
 # Function to read input from a text file
 def read_input_from_file(file_path):
@@ -39,7 +39,7 @@ def perform_search(input_data, driver):
             EC.element_to_be_clickable((By.ID, 'ctl00_ContentPlaceHolder1_rdoSearchByName'))
         )
         radio_button.click()
-        human_delay()
+        minimal_delay()
 
         # Wait for the County dropdown to be present
         county_dropdown = WebDriverWait(driver, 10).until(
@@ -48,46 +48,38 @@ def perform_search(input_data, driver):
 
         # Fill in the County dropdown
         Select(county_dropdown).select_by_visible_text(input_data['county'])
-        human_delay()
+        minimal_delay()
 
         # Fill in the Zip Code
         zip_code_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSzip')
         zip_code_field.clear()
-        for char in input_data['zip_code']:
-            zip_code_field.send_keys(char)
-            human_delay(min_seconds=0.1, max_seconds=0.3)
-        human_delay()
+        zip_code_field.send_keys(input_data['zip_code'])  # Directly send the entire string
+        minimal_delay()
 
         # Fill in the First Name
         first_name_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item2')
         first_name_field.clear()
-        for char in input_data['first_name']:
-            first_name_field.send_keys(char)
-            human_delay(min_seconds=0.1, max_seconds=0.3)
-        human_delay()
+        first_name_field.send_keys(input_data['first_name'])  # Directly send the entire string
+        minimal_delay()
 
         # Fill in the Last Name
         last_name_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item3')
         last_name_field.clear()
-        for char in input_data['last_name']:
-            last_name_field.send_keys(char)
-            human_delay(min_seconds=0.1, max_seconds=0.3)
-        human_delay()
+        last_name_field.send_keys(input_data['last_name'])  # Directly send the entire string
+        minimal_delay()
 
         # Fill in the Date of Birth
         dob_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item4')
         dob_field.clear()
-        for char in input_data['dob']:
-            dob_field.send_keys(char)
-            human_delay(min_seconds=0.1, max_seconds=0.3)
-        human_delay()
+        dob_field.send_keys(input_data['dob'])  # Directly send the entire string
+        minimal_delay()
 
         # Submit the form
         submit_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, 'ctl00_ContentPlaceHolder1_btnContinue'))
         )
         submit_button.click()
-        human_delay()
+        minimal_delay()
 
         # Wait for the results to load
         time.sleep(5)
@@ -108,6 +100,14 @@ def perform_search(input_data, driver):
     except Exception as e:
         print(f"An error occurred during the search: {e}")
         return None
+
+# Function to restart the browser and reload the page
+def restart_browser(service):
+    driver = webdriver.Chrome(service=service)
+    driver.minimize_window()
+    driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
+    minimal_delay()
+    return driver
 
 # Main script
 def main():
@@ -134,20 +134,15 @@ def main():
 
         # Initialize the WebDriver using the Service class
         service = Service(chrome_driver_path)
-        driver = webdriver.Chrome(service=service)
-
-        # Maximize the browser window
-        driver.maximize_window()
-
-        # Open the target website
-        driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
-        human_delay()
+        driver = restart_browser(service)
 
         # Process each inquiry
         for i, input_data in enumerate(input_data_list):
-            if i >= 16:
-                print("Reached the limit of 16 searches. Restart the script to continue.")
-                break
+            if i > 0 and i % 15 == 0:
+                print("Restarting the browser to prevent CAPTCHA...")
+                driver.quit()
+                time.sleep(random.randint(60, 120))  # Wait 1-2 minutes
+                driver = restart_browser(service)
 
             print(f"Processing inquiry {i + 1} for {input_data['first_name']} {input_data['last_name']}...")
             results = perform_search(input_data, driver)
@@ -160,12 +155,7 @@ def main():
 
             # Refresh the page for the next inquiry
             driver.refresh()
-            human_delay()
-
-            # Take a break after every 10 inquiries
-            if (i + 1) % 10 == 0:
-                print("Taking a break to avoid CAPTCHA...")
-                time.sleep(random.randint(60, 120))  # Wait 1-2 minutes
+            minimal_delay()
 
     except Exception as e:
         # Print the error message
