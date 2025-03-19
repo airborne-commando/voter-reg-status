@@ -11,7 +11,7 @@ This Python script automates the process of checking voter registration status o
 4. [Input File Format](#input-file-format)
 5. [Limitations](#limitations)
 6. [Troubleshooting](#troubleshooting)
-7. [quick tips on CSV](#QuickTipsonCSV)
+7. [quick tips on CSV](#quick-tips-on-csv)
 8. [License](#license)
 
 ---
