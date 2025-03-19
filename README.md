@@ -117,7 +117,6 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
    - Download the correct version from [here](https://sites.google.com/chromium.org/driver/).
 
 2. **Element Not Found**:
-   - Ensure the browser window is minimized (as per the script's configuration).
    - Check the page source (`page_source.txt`) and screenshot (`error_screenshot.png`) for debugging.
 
 3. **File Not Found**:
