@@ -150,6 +150,11 @@ I encourge you to take a look at the .ODS file.
 
 For quick generations, take a look at the csv-gen.py
 
+For reading a file
+
+city,zip,first,last,date/of/birth,days,additon to days
+city,00000,First,Last,01/01/1970,1,1
+
 ---
 
 ## License
