@@ -5,14 +5,14 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
-import sys  # Import the sys module for exiting the program
+import sys
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
 
 # Function to simulate minimal delays (optional)
 def minimal_delay():
-    time.sleep(0.01)  # Very small delay to avoid overwhelming the system
+    time.sleep(0.01)
 
 # Function to read input from a text file
 def read_input_from_file(file_path):
@@ -20,9 +20,17 @@ def read_input_from_file(file_path):
         lines = file.readlines()
         data = []
         for line in lines:
-            county, zip_code, first_name, last_name, dob = line.strip().split(',')
+            # Skip the header row if it exists
+            if line.startswith("City"):
+                continue
+            # Split by tab (since output.csv is tab-separated)
+            parts = line.strip().split('\t')
+            if len(parts) != 5:
+                print(f"Skipping invalid line: {line}")
+                continue
+            city, zip_code, first_name, last_name, dob = parts
             # Ensure the county name is in uppercase
-            county = county.upper()
+            county = city.upper()
             data.append({
                 'county': county,
                 'zip_code': zip_code,
@@ -54,25 +62,25 @@ def perform_search(input_data, driver):
         # Fill in the Zip Code
         zip_code_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSzip')
         zip_code_field.clear()
-        zip_code_field.send_keys(input_data['zip_code'])  # Directly send the entire string
+        zip_code_field.send_keys(input_data['zip_code'])
         minimal_delay()
 
         # Fill in the First Name
         first_name_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item2')
         first_name_field.clear()
-        first_name_field.send_keys(input_data['first_name'])  # Directly send the entire string
+        first_name_field.send_keys(input_data['first_name'])
         minimal_delay()
 
         # Fill in the Last Name
         last_name_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item3')
         last_name_field.clear()
-        last_name_field.send_keys(input_data['last_name'])  # Directly send the entire string
+        last_name_field.send_keys(input_data['last_name'])
         minimal_delay()
 
         # Fill in the Date of Birth
         dob_field = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_txtVRSOpt2Item4')
         dob_field.clear()
-        dob_field.send_keys(input_data['dob'])  # Directly send the entire string
+        dob_field.send_keys(input_data['dob'])
         minimal_delay()
 
         # Submit the form
@@ -112,6 +120,7 @@ def restart_browser(service):
 
 # Main script
 def main():
+    driver = None
     try:
         # Ask the user if they want to read input from a file
         use_file = input("Do you want to read input from a file? (yes/no): ").strip().lower()
@@ -120,7 +129,7 @@ def main():
             input_data_list = read_input_from_file(file_path)
         else:
             # Manual input for a single inquiry
-            county = input("County: ").upper()  # Ensure county is uppercase
+            county = input("County: ").upper()
             zip_code = input("Zip Code: ")
             first_name = input("First Name: ")
             last_name = input("Last Name: ")
@@ -153,7 +162,6 @@ def main():
                 with open(f"results_{input_data['first_name']}_{input_data['last_name']}.txt", 'w', encoding='utf-8') as f:
                     f.write(results)
                 print(f"Results saved to 'results_{input_data['first_name']}_{input_data['last_name']}.txt'.")
-                # Exit the program after finding results
                 sys.exit(0)
 
             # Refresh the page for the next inquiry
@@ -161,19 +169,15 @@ def main():
             minimal_delay()
 
     except Exception as e:
-        # Print the error message
         print(f"An error occurred: {e}")
-
-        # Save the page source to a file
-        with open('page_source.txt', 'w', encoding='utf-8') as f:
-            f.write(driver.page_source)
-
-        # Take a screenshot
-        driver.save_screenshot('error_screenshot.png')
+        if driver:
+            with open('page_source.txt', 'w', encoding='utf-8') as f:
+                f.write(driver.page_source)
+            driver.save_screenshot('error_screenshot.png')
 
     finally:
-        # Close the browser
-        driver.quit()
+        if driver:
+            driver.quit()
 
 if __name__ == "__main__":
     main()
