@@ -21,12 +21,20 @@ def read_input_from_file(file_path):
         data = []
         for line in lines:
             # Skip the header row if it exists
-            if line.startswith("City"):
+            if line.startswith("City") or line.startswith("county"):
                 continue
-            # Split by tab (since output.csv is tab-separated)
-            parts = line.strip().split('\t')
+            # Skip empty lines
+            if not line.strip():
+                continue
+            # Detect delimiter (tab or comma)
+            if '\t' in line:
+                delimiter = '\t'  # Tab-separated
+            else:
+                delimiter = ','   # Comma-separated
+            # Split by the detected delimiter
+            parts = line.strip().split(delimiter)
             if len(parts) != 5:
-                print(f"Skipping invalid line: {line}")
+                print(f"Skipping invalid line: {line.strip()}")
                 continue
             city, zip_code, first_name, last_name, dob = parts
             # Ensure the county name is in uppercase
