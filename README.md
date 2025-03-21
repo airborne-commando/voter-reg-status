@@ -148,6 +148,8 @@ and Will add in a sum
 
 I encourge you to take a look at the .ODS file.
 
+For quick generations, take a look at the csv-gen.py
+
 ---
 
 ## License
