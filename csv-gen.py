@@ -17,10 +17,10 @@ def parse_date(date_str):
         print("Invalid date format. Please use MM/DD/YYYY.")
         return None
 
-def generate_dates(start_date, num_rows):
+def generate_dates(start_date, num_rows, days_to_add):
     dates = []
     for i in range(num_rows):
-        dates.append((start_date + timedelta(days=i)).strftime("%m/%d/%Y"))
+        dates.append((start_date + timedelta(days=days_to_add * i)).strftime("%m/%d/%Y"))
     return dates
 
 def read_from_file(filename):
@@ -28,19 +28,20 @@ def read_from_file(filename):
     try:
         with open(filename, 'r') as file:
             for line in file:
-                # Expected format: City,Zip,First Name,Last Name,Start DOB,Num Rows
+                # Expected format: City,Zip,First Name,Last Name,Start DOB,Num Rows,Days to Add
                 parts = line.strip().split(',')
-                if len(parts) != 6:
+                if len(parts) != 7:
                     print(f"Skipping invalid line: {line}")
                     continue
-                city, zip_code, first_name, last_name, dob_str, num_rows = parts
+                city, zip_code, first_name, last_name, dob_str, num_rows, days_to_add = parts
                 start_date = parse_date(dob_str)
                 if not start_date:
                     continue
                 num_rows = int(num_rows)
+                days_to_add = int(days_to_add)
 
                 # Generate the list of dates
-                dates = generate_dates(start_date, num_rows)
+                dates = generate_dates(start_date, num_rows, days_to_add)
 
                 # Prepare data for CSV
                 for date in dates:
@@ -56,13 +57,11 @@ def show_help():
     - To read from a file: python csv-gen.py -file <filename>
     - To manually input data: python csv-gen.py
 
-    File for (comma-separated):
-    city,zip,first_name,last_name,start_dob(MM/DD/YYYY),num_rows
+    File format (comma-separated):
+    city,zip,first_name,last_name,start_dob(MM/DD/YYYY),num_rows,days_to_add
     Example:
-    Cityname,00000,John,Doe,10/01/1990,6
-    or two
-    Cityname,00000,John,Doe,10/01/1990,6
-    Cityname,00000,John,Doe,10/01/1990,24
+    Cityname,00000,John,D,10/01/1990,6,1
+    Cityname,00000,John,D,10/01/1990,3,2
     """)
 
 def main():
@@ -88,7 +87,8 @@ def main():
                 if not start_date:
                     continue
                 num_rows = int(input("Enter number of rows to generate: "))
-                dates = generate_dates(start_date, num_rows)
+                days_to_add = int(input("Enter days to add for each row: "))
+                dates = generate_dates(start_date, num_rows, days_to_add)
                 for date in dates:
                     data.append([city, zip_code, first_name, last_name, date])
             elif command == 'help':
