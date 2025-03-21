@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 def generate_csv(data, output_path='output.csv'):
     with open(output_path, mode='w', newline='') as file:
         writer = csv.writer(file, delimiter='\t')  # Use tab as delimiter
-        writer.writerow(["City", "Zip", "First Name", "Last Name", "DOB"])
         for row in data:
             writer.writerow(row)
     print(f"CSV file '{output_path}' has been generated.")
