@@ -5,7 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
-import sys
+import os
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
@@ -156,6 +156,12 @@ def main():
 
         # Process each inquiry
         for i, input_data in enumerate(input_data_list):
+            # Check if results already exist for this person
+            result_file = f"results_{input_data['first_name']}_{input_data['last_name']}.txt"
+            if os.path.exists(result_file):
+                print(f"Skipping {input_data['first_name']} {input_data['last_name']} (results already exist).")
+                continue
+
             if i > 0 and i % 15 == 0:
                 print("Restarting the browser to prevent CAPTCHA...")
                 driver.quit()
@@ -167,10 +173,9 @@ def main():
 
             if results:
                 # Save the results to a text file
-                with open(f"results_{input_data['first_name']}_{input_data['last_name']}.txt", 'w', encoding='utf-8') as f:
+                with open(result_file, 'w', encoding='utf-8') as f:
                     f.write(results)
-                print(f"Results saved to 'results_{input_data['first_name']}_{input_data['last_name']}.txt'.")
-                break  # Exit the loop after saving results
+                print(f"Results saved to '{result_file}'.")
 
             # Refresh the page for the next inquiry
             driver.refresh()
