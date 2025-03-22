@@ -106,14 +106,13 @@ def perform_search(input_data, driver):
             not_found_message = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_lblNotFound')
             if not_found_message.is_displayed():
                 print(f"No results found for {input_data['first_name']} {input_data['last_name']}.")
-                return None  # No results found
+                return None
         except:
             pass
 
         # Capture the results
         results = driver.find_element(By.ID, 'ctl00_ContentPlaceHolder1_UpdatePanel1').text
-        print(f"Results found for {input_data['first_name']} {input_data['last_name']}.")
-        return results  # Return the results as a string
+        return results
 
     except Exception as e:
         print(f"An error occurred during the search: {e}")
@@ -122,7 +121,7 @@ def perform_search(input_data, driver):
 # Function to restart the browser and reload the page
 def restart_browser(service):
     driver = webdriver.Chrome(service=service)
-    driver.minimize_window()
+    driver.maximize_window()
     driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
     minimal_delay()
     return driver
@@ -155,17 +154,8 @@ def main():
         service = Service(chrome_driver_path)
         driver = restart_browser(service)
 
-        # Track names that have already been processed
-        processed_names = set()
-
         # Process each inquiry
         for i, input_data in enumerate(input_data_list):
-            # Skip if the name has already been processed
-            name_key = f"{input_data['first_name']} {input_data['last_name']}"
-            if name_key in processed_names:
-                print(f"Skipping already processed name: {name_key}")
-                continue
-
             if i > 0 and i % 15 == 0:
                 print("Restarting the browser to prevent CAPTCHA...")
                 driver.quit()
@@ -178,10 +168,9 @@ def main():
             if results:
                 # Save the results to a text file
                 with open(f"results_{input_data['first_name']}_{input_data['last_name']}.txt", 'w', encoding='utf-8') as f:
-                    f.write(results)  # Write the results as a string
+                    f.write(results)
                 print(f"Results saved to 'results_{input_data['first_name']}_{input_data['last_name']}.txt'.")
-                # Add the name to the processed set
-                processed_names.add(name_key)
+                break  # Exit the loop after saving results
 
             # Refresh the page for the next inquiry
             driver.refresh()
