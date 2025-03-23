@@ -121,10 +121,30 @@ def perform_search(input_data, driver):
 # Function to restart the browser and reload the page
 def restart_browser(service):
     driver = webdriver.Chrome(service=service)
-    driver.minimize_window()
+    driver.maximize_window()
     driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
     minimal_delay()
     return driver
+
+# Function to check if the file size is 1.4 KiB (1,417 bytes)
+def is_junk_file(file_path):
+    try:
+        # Get the file size in bytes
+        file_size = os.path.getsize(file_path)
+        # Check if the file size is 1,417 bytes
+        return file_size == 1417
+    except:
+        return False
+
+# Function to check and remove junk files
+def check_and_remove_junk_files(input_data):
+    result_file = f"results_{input_data['first_name']}_{input_data['last_name']}.txt"
+    if os.path.exists(result_file):
+        if is_junk_file(result_file):
+            print(f"Junk file detected for {input_data['first_name']} {input_data['last_name']}. Removing file...")
+            os.remove(result_file)
+            return True  # Indicates that the file was removed
+    return False  # No junk file found
 
 # Main script
 def main():
@@ -158,6 +178,15 @@ def main():
         for i, input_data in enumerate(input_data_list):
             # Check if results already exist for this person
             result_file = f"results_{input_data['first_name']}_{input_data['last_name']}.txt"
+
+            # Check and remove junk files if they exist
+            if check_and_remove_junk_files(input_data):
+                print(f"Retrying search for {input_data['first_name']} {input_data['last_name']}...")
+                # Restart the browser to avoid CAPTCHA or other issues
+                driver.quit()
+                time.sleep(random.randint(10, 15))  # sleep timer, random will patch later
+                driver = restart_browser(service)
+
             if os.path.exists(result_file):
                 print(f"Skipping {input_data['first_name']} {input_data['last_name']} (results already exist).")
                 continue
@@ -165,7 +194,7 @@ def main():
             if i > 0 and i % 15 == 0:
                 print("Restarting the browser to prevent CAPTCHA...")
                 driver.quit()
-                time.sleep(random.randint(60, 120))  # Wait 1-2 minutes
+                time.sleep(random.randint(10, 15))  # Wait 1-2 minutes
                 driver = restart_browser(service)
 
             print(f"Processing inquiry {i + 1} for {input_data['first_name']} {input_data['last_name']}...")
@@ -176,6 +205,15 @@ def main():
                 with open(result_file, 'w', encoding='utf-8') as f:
                     f.write(results)
                 print(f"Results saved to '{result_file}'.")
+
+                # Check if the newly saved file is junk
+                if is_junk_file(result_file):
+                    print(f"Junk file detected for {input_data['first_name']} {input_data['last_name']}. Removing file and retrying...")
+                    os.remove(result_file)  # Remove the junk file
+                    driver.quit()  # Restart the browser
+                    time.sleep(random.randint(10, 15))  # Wait 1-2 minutes
+                    driver = restart_browser(service)
+                    continue  # Retry the same inquiry
 
             # Refresh the page for the next inquiry
             driver.refresh()
