@@ -121,7 +121,7 @@ def perform_search(input_data, driver):
 # Function to restart the browser and reload the page
 def restart_browser(service):
     driver = webdriver.Chrome(service=service)
-    driver.maximize_window()
+    driver.minimize_window()
     driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
     minimal_delay()
     return driver
