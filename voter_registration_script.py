@@ -1,17 +1,12 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options  # This was missing
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
 import os
-
-    # Set up Chrome options
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-extensions")
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
@@ -126,8 +121,15 @@ def perform_search(input_data, driver):
 
 # Function to restart the browser and reload the page
 def restart_browser(service):
-    driver = webdriver.Chrome(service=service)
-    driver.minimize_window()
+    # Set up Chrome options for headless
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--no-sandbox")  # Important for Linux
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Important for Linux
+    chrome_options.add_argument("--window-size=1920,1080")  # Set window size
+    
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get('https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx')
     minimal_delay()
     return driver
