@@ -7,6 +7,12 @@ import time
 import random
 import os
 
+    # Set up Chrome options
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--disable-extensions")
+
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
 
