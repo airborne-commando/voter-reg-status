@@ -93,7 +93,7 @@ def load_municipality_mapping(csv_folder='csv-dataset'):
                 log_message(f"Error processing {filename}: {str(e)}")
                 continue
 
-def load_zip_mapping(zip_file='zip-codes.txt'):
+def load_zip_mapping(zip_file='zip-database/zip-codes.txt'):
     ZIP_TO_COUNTY.clear()
     ZIP_TO_CITY = {}  # New dictionary to map ZIP to city
     with open(zip_file, 'r') as file:
