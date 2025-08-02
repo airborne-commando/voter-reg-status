@@ -1,6 +1,6 @@
 # Voter Registration Automation Script
 
-This Python script automates the process of checking voter registration status on the [Pennsylvania Voter Services](https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx) website. It uses Selenium to interact with the web page, fill out the form, and retrieve the results. Works well with my [osint list](https://github.com/airborne-commando/OPSEC-OSINT-Tools) or any other list.
+This Python script automates the process of checking voter registration status on the [Pennsylvania Voter Services](https://www.pavoterservices.pa.gov/pages/voterregistrationstatus.aspx) website. It uses Selenium to interact with the web page, fill out the form, and retrieve the results. Works well with my [osint list](https://github.com/airborne-commando/OPSEC-OSINT-Tools) or any other list as long as you reside in PA.
 
 ---
 
