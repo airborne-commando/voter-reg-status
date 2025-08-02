@@ -35,7 +35,7 @@ Before running the script, ensure you have the following installed:
    ```
 
 2. **Set Up a Virtual Environment** (optional but recommended):
-   ```bash
+   ```
    python3 -m venv venv
    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
    ```
@@ -60,7 +60,7 @@ Before running the script, ensure you have the following installed:
    - You can either provide input manually or use a CSV file. See the [Input File Format](#input-file-format) section for details.
 
 2. **Run the Script**:
-   ```bash
+   ```
    python3 voter_registration_script.py
    ```
 
@@ -84,15 +84,10 @@ county,zip_code,first_name,last_name,dob
 
 Example (`input.csv`):
 ```
-ADAMS,12345,John,Doe,01/01/1990
-ALLEGHENY,54321,Jane,Smith,02/02/1980
+Erie,19084,dev,null,07/01/1984
 ```
 
-- **County**: Must be in uppercase (e.g., `ADAMS`).
-- **Zip Code**: A valid 5-digit zip code.
-- **First Name**: The voter's first name.
-- **Last Name**: The voter's last name.
-- **Date of Birth**: In the format `mm/dd/yyyy`.
+The city will be found inside the zip database folder along with the CSV folder if it's legit.
 
 ---
 
@@ -142,9 +137,7 @@ format the dob as a date for MM/DD/YYYY
 
 then add the cell + 1 for the dob, be sure to make sure it's in date MM/DD/YYYY formatting
 
-add =E1+1 and you should be able to add the day.
-
-
+add =E1+1 and you should be able to add the day of the month.
 
 ---
 
