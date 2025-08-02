@@ -87,7 +87,19 @@ Example (`input.csv`):
 Erie,19084,dev,null,07/01/1984
 ```
 
-The city will be found inside the zip database folder along with the CSV folder if it's legit.
+The city will be found inside the zip database folder along with the CSV folder if it's legit, will also add in the day of the month automatically for you.
+
+Example 
+```
+Erie,19084,dev,null,07/01/1984
+Erie,19084,dev,null,07/02/1984
+```
+
+
+```
+Erie,19084,dev,null,07/02/1984
+```
+The second day didn't exist in the CSV.
 
 ---
 
