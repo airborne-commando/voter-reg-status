@@ -194,13 +194,19 @@ def read_input_from_file(file_path):
             city, zip_code, first_name, last_name, dob = parts
             # Convert city to proper county, passing zip_code for disambiguation
             county = get_county(city, zip_code)
-            data.append({
-                'county': county,
-                'zip_code': zip_code,
-                'first_name': first_name,
-                'last_name': last_name,
-                'dob': dob
-            })
+            
+            # Generate all dates in the month (01 to 31)
+            month, year = dob.split('/')[0], dob.split('/')[2]
+            for day in range(1, 32):
+                formatted_day = f"{day:02d}"
+                new_dob = f"{month}/{formatted_day}/{year}"
+                data.append({
+                    'county': county,
+                    'zip_code': zip_code,
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'dob': new_dob
+                })
     return data
 
 # Function to perform a single search
