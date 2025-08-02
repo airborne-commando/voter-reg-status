@@ -277,7 +277,7 @@ def perform_search(input_data, driver):
 def restart_browser(service):
     # Set up Chrome options for headless
     chrome_options = Options()
-#    chrome_options.add_argument("--headless")  # Run in headless mode
+    chrome_options.add_argument("--headless")  # Run in headless mode
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")  # Important for Linux
     chrome_options.add_argument("--disable-dev-shm-usage")  # Important for Linux
