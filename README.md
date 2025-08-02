@@ -117,27 +117,6 @@ The city will be found inside the zip database folder along with the CSV folder 
 
 3. **File Not Found**:
    - Ensure the input file path is correct and the file is formatted properly.
-  
----
-
-
-## Quick Tips on CSV
-
-create a text file
-
-enter it as
-
-`city,zip,first,last,00/01/1984`
-
-save the text file as a .csv file
-
-open the csv file on a csv editor; can be libreoffice-calc or anything else.
-
-format the dob as a date for MM/DD/YYYY
-
-then add the cell + 1 for the dob, be sure to make sure it's in date MM/DD/YYYY formatting
-
-add =E1+1 and you should be able to add the day of the month.
 
 ---
 
