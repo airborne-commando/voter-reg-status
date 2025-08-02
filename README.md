@@ -156,13 +156,6 @@ For reading a file
 
 `city,00000,First,Last,01/01/1970,1,1`
 
-
-Also should note:
-
-The Pennsylvania census, as part of the U.S. federal census, is conducted once every ten years, typically on April 1st of the census year. For example, the 2020 Census counted residents as of April 1, 2020.
-
-This relies on the Census possibly.
-
 ---
 
 ## License
