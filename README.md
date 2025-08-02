@@ -128,33 +128,23 @@ ALLEGHENY,54321,Jane,Smith,02/02/1980
 
 ## Quick Tips on CSV
 
-Edit the city_temp.ODS values with libre office and save the file as a .csv
+create a text file
 
-Here's How I did this
+enter it as
 
-A2 will copy =A1
-B2 Will copy =B1
-and so forth.
+`city,zip,first,last,00/01/1984`
 
-=DATE(1970,12,1) for the date as an example (e1)
+save the text file as a .csv file
 
-E2 will add E1
+open the csv file on a csv editor; can be libreoffice-calc or anything else.
 
-=E1+1
+format the dob as a date for MM/DD/YYYY
 
-and Will add in a sum
+then add the cell + 1 for the dob, be sure to make sure it's in date MM/DD/YYYY formatting
 
-=SUM(E2)+1
+add =E1+1 and you should be able to add the day.
 
-I encourge you to take a look at the .ODS file.
 
-For quick generations, take a look at the csv-gen.py
-
-For reading a file
-
-`city,zip,first,last,date/of/birth,days,additon to days`
-
-`city,00000,First,Last,01/01/1970,1,1`
 
 ---
 
