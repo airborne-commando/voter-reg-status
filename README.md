@@ -29,7 +29,7 @@ Before running the script, ensure you have the following installed:
 ## Installation
 
 1. **Clone the Repository**:
-   ```bash
+   ```
    git clone https://github.com/airborne-commando/voter-reg-status.git
    cd voter-reg-status
    ```
@@ -42,7 +42,7 @@ Before running the script, ensure you have the following installed:
 
 3. **Install Dependencies**:
    Install the required Python packages using `pip`:
-   ```bash
+   ```
    pip install selenium
    ```
 
@@ -92,8 +92,10 @@ The city will be found inside the zip database folder along with the CSV folder 
 Example 
 ```
 Erie,19084,dev,null,07/01/1984
-Erie,19084,dev,null,07/02/1984
+Erie,13337,dev,null,08/05/1940
 ```
+
+Will also process speperate searches of different people.
 
 
 ```
