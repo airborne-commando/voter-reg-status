@@ -1,21 +1,175 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options  # This was missing
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 import time
 import random
 import os
+import csv
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
+
+# Dictionaries to cache mappings
+MUNICIPALITY_TO_COUNTIES = {}
+ZIP_TO_COUNTY = {}
+
+# Function to load municipality to counties mapping from CSV files in csv-dataset folder
+def load_municipality_mapping(csv_folder='csv-dataset'):
+    # Clear existing mapping
+    MUNICIPALITY_TO_COUNTIES.clear()
+    
+    # Get all CSV files in the folder
+    csv_files = [f for f in os.listdir(csv_folder) if f.endswith('.csv')]
+    
+    for filename in csv_files:
+        with open(os.path.join(csv_folder, filename), mode='r') as csv_file:
+            # Try different delimiters and header formats
+            try:
+                # First try tab-delimited with expected headers
+                csv_reader = csv.DictReader(csv_file, delimiter='\t')
+                row = next(csv_reader)  # Try reading first row to check columns
+                
+                # Check for required columns (case insensitive)
+                required_columns = {'municipality', 'county'}
+                actual_columns = {col.lower() for col in row.keys()}
+                
+                if not required_columns.issubset(actual_columns):
+                    # Try comma-delimited if tab fails
+                    csv_file.seek(0)
+                    csv_reader = csv.DictReader(csv_file, delimiter=',')
+                    row = next(csv_reader)
+                    actual_columns = {col.lower() for col in row.keys()}
+                    if not required_columns.issubset(actual_columns):
+                        log_message(f"Skipping {filename}: Missing required columns")
+                        continue
+                
+                # Determine column names (case insensitive)
+                col_map = {}
+                for col in csv_reader.fieldnames:
+                    lower_col = col.lower()
+                    if lower_col == 'municipality':
+                        col_map['municipality'] = col
+                    elif lower_col == 'county':
+                        col_map['county'] = col
+                
+                # Process all rows
+                csv_file.seek(0)
+                next(csv_reader)  # Skip header
+                for row in csv_reader:
+                    try:
+                        municipality = row[col_map['municipality']].lower().strip()
+                        county = row[col_map['county']].upper().strip()
+                        
+                        # Initialize list if municipality not in dictionary
+                        if municipality not in MUNICIPALITY_TO_COUNTIES:
+                            MUNICIPALITY_TO_COUNTIES[municipality] = []
+                        
+                        # Add county if not already in list
+                        if county not in MUNICIPALITY_TO_COUNTIES[municipality]:
+                            MUNICIPALITY_TO_COUNTIES[municipality].append(county)
+                        
+                        # Add common variations
+                        variations = []
+                        if "borough" in municipality:
+                            variations.append(municipality.replace(" borough", ""))
+                        elif "township" in municipality:
+                            variations.append(municipality.replace(" township", ""))
+                        elif "city" in municipality:
+                            variations.append(municipality.replace(" city", ""))
+                        
+                        for variation in variations:
+                            if variation not in MUNICIPALITY_TO_COUNTIES:
+                                MUNICIPALITY_TO_COUNTIES[variation] = []
+                            if county not in MUNICIPALITY_TO_COUNTIES[variation]:
+                                MUNICIPALITY_TO_COUNTIES[variation].append(county)
+                    except KeyError as e:
+                        log_message(f"Skipping row in {filename}: Missing column {e}")
+                        continue
+                        
+            except Exception as e:
+                log_message(f"Error processing {filename}: {str(e)}")
+                continue
+
+def load_zip_mapping(zip_file='zip-codes.txt'):
+    ZIP_TO_COUNTY.clear()
+    ZIP_TO_CITY = {}  # New dictionary to map ZIP to city
+    with open(zip_file, 'r') as file:
+        for line in file:
+            if line.strip() and line.startswith("ZIP Code"):
+                parts = line.strip().split('\t')
+                if len(parts) >= 3:
+                    zip_code = parts[0].replace("ZIP Code ", "").strip()
+                    city = parts[1].strip().lower()
+                    county = parts[2].strip().upper()
+                    ZIP_TO_COUNTY[zip_code] = county
+                    ZIP_TO_CITY[zip_code] = city
+
+def get_county(municipality_name, zip_code=None):
+    # Clean inputs
+    lower_municipality = municipality_name.lower().strip()
+    
+    # Try ZIP code first if available
+    if zip_code:
+        # First try exact ZIP code match
+        if zip_code in ZIP_TO_COUNTY:
+            return ZIP_TO_COUNTY[zip_code]
+        
+        # Then try matching city name from ZIP database
+        if zip_code in ZIP_TO_CITY:
+            zip_city = ZIP_TO_CITY[zip_code]
+            if zip_city in MUNICIPALITY_TO_COUNTIES:
+                counties = MUNICIPALITY_TO_COUNTIES[zip_city]
+                if len(counties) == 1:
+                    return counties[0]
+    
+    # Then try municipality mapping
+    if lower_municipality in MUNICIPALITY_TO_COUNTIES:
+        counties = MUNICIPALITY_TO_COUNTIES[lower_municipality]
+        if len(counties) == 1:
+            return counties[0]
+        
+        # If multiple counties, try to match with ZIP city
+        if zip_code and zip_code in ZIP_TO_CITY:
+            zip_city = ZIP_TO_CITY[zip_code]
+            if zip_city.lower() == lower_municipality:
+                return ZIP_TO_COUNTY.get(zip_code, counties[0])
+    
+    # Try common variations (remove "township", "borough", etc.)
+    variations = [
+        lower_municipality.replace(" township", ""),
+        lower_municipality.replace(" borough", ""),
+        lower_municipality.replace(" city", ""),
+        lower_municipality.replace(" town", ""),
+        lower_municipality.split("(")[0].strip(),
+    ]
+    
+    for variation in variations:
+        if variation in MUNICIPALITY_TO_COUNTIES:
+            counties = MUNICIPALITY_TO_COUNTIES[variation]
+            if len(counties) == 1:
+                return counties[0]
+    
+    # If we get here and have multiple counties, log warning
+    if lower_municipality in MUNICIPALITY_TO_COUNTIES:
+        counties = MUNICIPALITY_TO_COUNTIES[lower_municipality]
+        if len(counties) > 1:
+            log_message(f"Warning: Municipality '{municipality_name}' exists in multiple counties: {', '.join(counties)}")
+            if zip_code:
+                log_message(f"Using first county in list for zip code {zip_code} (no exact match found)")
+            return counties[0]
+    
+    # If not found, return the original input in uppercase
+    log_message(f"Warning: Municipality '{municipality_name}' not found in mapping. Using as county name.")
+    return municipality_name.upper()
 
 # Function to simulate minimal delays (optional)
 def minimal_delay():
     time.sleep(0.01)
 
-# Function to read input from a text file
+# Update the read_input_from_file function to pass zip_code to get_county
 def read_input_from_file(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
@@ -38,8 +192,8 @@ def read_input_from_file(file_path):
                 print(f"Skipping invalid line: {line.strip()}")
                 continue
             city, zip_code, first_name, last_name, dob = parts
-            # Ensure the county name is in uppercase
-            county = city.upper()
+            # Convert city to proper county, passing zip_code for disambiguation
+            county = get_county(city, zip_code)
             data.append({
                 'county': county,
                 'zip_code': zip_code,
@@ -123,7 +277,7 @@ def perform_search(input_data, driver):
 def restart_browser(service):
     # Set up Chrome options for headless
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode
+#    chrome_options.add_argument("--headless")  # Run in headless mode
     chrome_options.add_argument("--disable-gpu")
     chrome_options.add_argument("--no-sandbox")  # Important for Linux
     chrome_options.add_argument("--disable-dev-shm-usage")  # Important for Linux
@@ -162,6 +316,13 @@ def log_message(message):
 
 # Main script
 def main():
+    # Load the mappings at startup
+    try:
+        load_municipality_mapping()
+        load_zip_mapping()
+    except Exception as e:
+        log_message(f"Warning: Could not load mapping files. Using fallback method. Error: {e}")
+
     driver = None
     try:
         # Ask the user if they want to read input from a file
@@ -171,7 +332,8 @@ def main():
             input_data_list = read_input_from_file(file_path)
         else:
             # Manual input for a single inquiry
-            county = input("County: ").upper()
+            city = input("City/Borough: ")
+            county = get_county(city)  # Convert city to county
             zip_code = input("Zip Code: ")
             first_name = input("First Name: ")
             last_name = input("Last Name: ")
