@@ -8,7 +8,6 @@ import time
 import random
 import os
 import csv
-import calendar
 
 # Path to ChromeDriver
 chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
@@ -16,23 +15,11 @@ chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
 # Dictionaries to cache mappings
 MUNICIPALITY_TO_COUNTIES = {}
 ZIP_TO_COUNTY = {}
-ZIP_TO_CITY = {}
 
 # Function to ensure results directory exists
 def ensure_results_dir():
     if not os.path.exists('results'):
         os.makedirs('results')
-
-# Function to check if results contain junk content
-def is_junk_content(content):
-    if not content:
-        return True
-    junk_phrases = [
-        "FIND VOTER REGISTRATION STATUS",
-        "Your search did not return any results",
-        "Please correct the errors below and try again"
-    ]
-    return any(phrase in content for phrase in junk_phrases)
 
 # Function to load municipality to counties mapping from CSV files in csv-dataset folder
 def load_municipality_mapping(csv_folder='csv-dataset'):
@@ -113,7 +100,7 @@ def load_municipality_mapping(csv_folder='csv-dataset'):
 
 def load_zip_mapping(zip_file='zip-database/zip-codes.txt'):
     ZIP_TO_COUNTY.clear()
-    ZIP_TO_CITY.clear()
+    ZIP_TO_CITY = {}  # New dictionary to map ZIP to city
     with open(zip_file, 'r') as file:
         for line in file:
             if line.strip() and line.startswith("ZIP Code"):
@@ -231,79 +218,6 @@ def read_input_from_file(file_path):
                 })
     return data
 
-def is_valid_date(month, day, year):
-    try:
-        month = int(month)
-        day = int(day)
-        year = int(year)
-        
-        # Check if month is valid (1-12)
-        if month < 1 or month > 12:
-            return False
-            
-        # Check if day is valid for the month
-        _, last_day = calendar.monthrange(year, month)
-        if day < 1 or day > last_day:
-            return False
-            
-        return True
-    except ValueError:
-        return False
-
-def read_input_from_file(file_path):
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-        data = []
-        for line in lines:
-            # Skip the header row if it exists
-            if line.startswith("City") or line.startswith("county"):
-                continue
-            # Skip empty lines
-            if not line.strip():
-                continue
-            # Detect delimiter (tab or comma)
-            if '\t' in line:
-                delimiter = '\t'  # Tab-separated
-            else:
-                delimiter = ','   # Comma-separated
-            # Split by the detected delimiter
-            parts = line.strip().split(delimiter)
-            if len(parts) != 5:
-                print(f"Skipping invalid line: {line.strip()}")
-                continue
-            city, zip_code, first_name, last_name, dob = parts
-            
-            # Parse the input date and validate
-            try:
-                month, day, year = dob.split('/')
-                if not is_valid_date(month, day, year):
-                    log_message(f"Skipping invalid date {dob} for {first_name} {last_name}")
-                    continue
-            except ValueError:
-                log_message(f"Skipping malformed date {dob} for {first_name} {last_name}")
-                continue
-            
-            # Convert city to proper county, passing zip_code for disambiguation
-            county = get_county(city, zip_code)
-            start_day = int(day)
-            
-            # Generate dates starting from the input day, then wrap around the month
-            for offset in range(0, 31):  # Check all 31 possible days
-                day_to_try = (start_day + offset - 1) % 31 + 1  # Wrap around after day 31
-                # Validate the generated date
-                if not is_valid_date(month, day_to_try, year):
-                    continue
-                formatted_day = f"{day_to_try:02d}"
-                new_dob = f"{month}/{formatted_day}/{year}"
-                data.append({
-                    'county': county,
-                    'zip_code': zip_code,
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'dob': new_dob
-                })
-    return data
-
 # Function to perform a single search
 def perform_search(input_data, driver):
     try:
@@ -403,20 +317,11 @@ def is_junk_file(file_path):
 def check_and_remove_junk_files(input_data):
     result_file = os.path.join('results', f"results_{input_data['first_name']}_{input_data['last_name']}.txt")
     if os.path.exists(result_file):
-        # Check file size first
         if is_junk_file(result_file):
             log_message(f"Junk file detected for {input_data['first_name']} {input_data['last_name']}. Removing file...")
             os.remove(result_file)
-            return True
-        
-        # Then check content
-        with open(result_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-            if is_junk_content(content):
-                log_message(f"Junk content detected for {input_data['first_name']} {input_data['last_name']}. Removing file...")
-                os.remove(result_file)
-                return True
-    return False
+            return True  # Indicates that the file was removed
+    return False  # No junk file found
 
 # Function to log messages to log.txt
 def log_message(message):
@@ -451,10 +356,19 @@ def main():
             # Log the current line being processed
             log_message(f"Processing line {i + 1} in the CSV file: {input_data}")
 
-            # Skip if date is invalid (shouldn't happen since we filtered in read_input_from_file)
-            month, day, year = input_data['dob'].split('/')
-            if not is_valid_date(month, day, year):
-                log_message(f"Skipping invalid date {input_data['dob']} for {input_data['first_name']} {input_data['last_name']}")
+            # Check if results already exist for this person
+            result_file = os.path.join('results', f"results_{input_data['first_name']}_{input_data['last_name']}.txt")
+
+            # Check and remove junk files if they exist
+            if check_and_remove_junk_files(input_data):
+                log_message(f"Retrying search for {input_data['first_name']} {input_data['last_name']}...")
+                # Restart the browser to avoid CAPTCHA or other issues
+                driver.quit()
+                time.sleep(random.randint(10, 15))  # sleep timer, random will patch later
+                driver = restart_browser(service)
+
+            if os.path.exists(result_file):
+                log_message(f"Skipping {input_data['first_name']} {input_data['last_name']} (results already exist).")
                 continue
 
             if i > 0 and i % 15 == 0:
@@ -463,37 +377,23 @@ def main():
                 time.sleep(random.randint(10, 15))  # Wait 1-2 minutes
                 driver = restart_browser(service)
 
-            retry_count = 0
-            max_retries = 2  # Maximum number of retries for junk results
-            
-            while retry_count <= max_retries:
-                log_message(f"Processing inquiry {i + 1} for {input_data['first_name']} {input_data['last_name']} (attempt {retry_count + 1})...")
-                results = perform_search(input_data, driver)
+            log_message(f"Processing inquiry {i + 1} for {input_data['first_name']} {input_data['last_name']}...")
+            results = perform_search(input_data, driver)
 
-                if results:
-                    # Check if results are junk
-                    if not is_junk_content(results):
-                        # Save the results to a text file in the results folder
-                        with open(result_file, 'w', encoding='utf-8') as f:
-                            f.write(results)
-                        log_message(f"Valid results saved to '{result_file}'.")
-                        break  # Exit retry loop if we got valid results
-                    else:
-                        log_message(f"Junk results detected for {input_data['first_name']} {input_data['last_name']}")
-                        if retry_count < max_retries:
-                            log_message("Retrying after browser restart...")
-                            driver.quit()
-                            time.sleep(random.randint(10, 15))
-                            driver = restart_browser(service)
-                            retry_count += 1
-                        else:
-                            log_message(f"Max retries reached for {input_data['first_name']} {input_data['last_name']}. Saving junk results for manual review.")
-                            with open(result_file, 'w', encoding='utf-8') as f:
-                                f.write(results)
-                            break
-                else:
-                    log_message(f"No results obtained for {input_data['first_name']} {input_data['last_name']}")
-                    break
+            if results:
+                # Save the results to a text file in the results folder
+                with open(result_file, 'w', encoding='utf-8') as f:
+                    f.write(results)
+                log_message(f"Results saved to '{result_file}'.")
+
+                # Check if the newly saved file is junk
+                if is_junk_file(result_file):
+                    log_message(f"Junk file detected for {input_data['first_name']} {input_data['last_name']}. Removing file and retrying...")
+                    os.remove(result_file)  # Remove the junk file
+                    driver.quit()  # Restart the browser
+                    time.sleep(random.randint(10, 15))  # Wait 1-2 minutes
+                    driver = restart_browser(service)
+                    continue  # Retry the same inquiry
 
             # Refresh the page for the next inquiry
             driver.refresh()
