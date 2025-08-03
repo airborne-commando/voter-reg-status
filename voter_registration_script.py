@@ -195,10 +195,14 @@ def read_input_from_file(file_path):
             # Convert city to proper county, passing zip_code for disambiguation
             county = get_county(city, zip_code)
             
-            # Generate all dates in the month (01 to 31)
-            month, year = dob.split('/')[0], dob.split('/')[2]
-            for day in range(1, 32):
-                formatted_day = f"{day:02d}"
+            # Parse the input date
+            month, day, year = dob.split('/')
+            start_day = int(day)
+            
+            # Generate dates starting from the input day, then wrap around the month
+            for offset in range(0, 31):  # Check all 31 possible days
+                day_to_try = (start_day + offset - 1) % 31 + 1  # Wrap around after day 31
+                formatted_day = f"{day_to_try:02d}"
                 new_dob = f"{month}/{formatted_day}/{year}"
                 data.append({
                     'county': county,
