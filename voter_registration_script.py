@@ -16,11 +16,6 @@ chrome_driver_path = '/usr/bin/chromedriver'  # Adjust if necessary
 MUNICIPALITY_TO_COUNTIES = {}
 ZIP_TO_COUNTY = {}
 
-# Function to ensure results directory exists
-def ensure_results_dir():
-    if not os.path.exists('results'):
-        os.makedirs('results')
-
 # Function to load municipality to counties mapping from CSV files in csv-dataset folder
 def load_municipality_mapping(csv_folder='csv-dataset'):
     # Clear existing mapping
@@ -315,7 +310,7 @@ def is_junk_file(file_path):
 
 # Function to check and remove junk files
 def check_and_remove_junk_files(input_data):
-    result_file = os.path.join('results', f"results_{input_data['first_name']}_{input_data['last_name']}.txt")
+    result_file = f"results_{input_data['first_name']}_{input_data['last_name']}.txt"
     if os.path.exists(result_file):
         if is_junk_file(result_file):
             log_message(f"Junk file detected for {input_data['first_name']} {input_data['last_name']}. Removing file...")
@@ -331,9 +326,6 @@ def log_message(message):
 
 # Main script
 def main():
-    # Ensure results directory exists
-    ensure_results_dir()
-    
     # Load the mappings at startup
     try:
         load_municipality_mapping()
@@ -357,7 +349,7 @@ def main():
             log_message(f"Processing line {i + 1} in the CSV file: {input_data}")
 
             # Check if results already exist for this person
-            result_file = os.path.join('results', f"results_{input_data['first_name']}_{input_data['last_name']}.txt")
+            result_file = f"results_{input_data['first_name']}_{input_data['last_name']}.txt"
 
             # Check and remove junk files if they exist
             if check_and_remove_junk_files(input_data):
@@ -381,7 +373,7 @@ def main():
             results = perform_search(input_data, driver)
 
             if results:
-                # Save the results to a text file in the results folder
+                # Save the results to a text file
                 with open(result_file, 'w', encoding='utf-8') as f:
                     f.write(results)
                 log_message(f"Results saved to '{result_file}'.")
