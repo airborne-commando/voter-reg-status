@@ -79,27 +79,27 @@ Before running the script, ensure you have the following installed:
 
 If using a file for input, it should be formatted as a CSV file with the following columns:
 ```
-county,zip_code,first_name,last_name,dob
+zip_code,first_name,last_name,dob
 ```
 
 Example (`input.csv`):
 ```
-Erie,19084,dev,null,07/01/1984
+19084,dev,null,07/01/1984
 ```
 
 The city will be found inside the zip database folder along with the CSV folder if it's legit, will also add in the day of the month automatically for you.
 
 Example 
 ```
-Erie,19084,dev,null,07/01/1984
-Erie,13337,dev,null,08/05/1940
+19084,dev,null,07/01/1984
+13337,dev,null,08/05/1940
 ```
 
 Will also process speperate searches of different people.
 
 
 ```
-Erie,19084,dev,null,07/02/1984
+19084,dev,null,07/02/1984
 ```
 The second day didn't exist in the CSV.
 
