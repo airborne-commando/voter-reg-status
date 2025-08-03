@@ -273,7 +273,37 @@ def read_input_from_file(file_path):
                 continue
             city, zip_code, first_name, last_name, dob = parts
             
-            # Parse the input date and validate
+            # Handle special case where month and day are both "00"
+            if dob.startswith("00/00/"):
+                year = dob.split('/')[2]
+                try:
+                    year_int = int(year)
+                except ValueError:
+                    log_message(f"Skipping malformed year {year} for {first_name} {last_name}")
+                    continue
+                
+                # Generate all valid month/day combinations for the year
+                for month in range(1, 13):
+                    # Get the last day of the month
+                    _, last_day = calendar.monthrange(year_int, month)
+                    for day in range(1, last_day + 1):
+                        formatted_month = f"{month:02d}"
+                        formatted_day = f"{day:02d}"
+                        new_dob = f"{formatted_month}/{formatted_day}/{year}"
+                        
+                        # Convert city to proper county, passing zip_code for disambiguation
+                        county = get_county(city, zip_code)
+                        
+                        data.append({
+                            'county': county,
+                            'zip_code': zip_code,
+                            'first_name': first_name,
+                            'last_name': last_name,
+                            'dob': new_dob
+                        })
+                continue
+            
+            # Normal date processing for non-special cases
             try:
                 month, day, year = dob.split('/')
                 if not is_valid_date(month, day, year):
