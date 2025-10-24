@@ -6,6 +6,10 @@ Use this tapermonkey script, will make a repo later:
 
 https://gist.github.com/airborne-commando/54f0f32b8cbce4bb8b76419159d3c2ff
 
+View raw
+
+https://gist.githubusercontent.com/airborne-commando/54f0f32b8cbce4bb8b76419159d3c2ff/raw/pavoter-tapetmonkey.js
+
 ---
 
 ## Table of Contents
